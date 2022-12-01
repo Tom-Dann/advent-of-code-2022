@@ -2,7 +2,7 @@
   "name": "advent-of-code-2022",
   "version": "1.0.0",
   "repository": "git@github.com:Tom-Dann/advent-of-code-2022.git",
-  "description": "",
+  "description": "TypeScript solutions for Advent of Code 2022",
   "devDependencies": {
     "@types/node": "^18.11.9",
     "typescript": "^4.8.4"
