@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 
-let input = readFileSync('input.txt', 'utf-8');
+let input = readFileSync(__dirname + '/input.txt', 'utf-8');
 let elves = input.split('\n\n').map(x => x.split('\n').map(y => parseInt(y)));
 
 let sum = (a: number, b: number) => a + b;

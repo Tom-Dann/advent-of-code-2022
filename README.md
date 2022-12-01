@@ -13,5 +13,4 @@ Compile TypeScript
 
 Run JS file of the format `<day>/<part>.js`
 
-    % cd src/day09
-    % node part2.js
+    % node src/day12/part2.js
