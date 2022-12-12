@@ -1,4 +1,4 @@
-namespace part1 {
+namespace part2 {
     let input = `abcccaaaaaaccccccccaaaaaccccccaaaaaaccccccaaaaaaaacccaaaaaaaccaaaacccccccccccccccccccccccccaaaaaacccccccccccccccccccccccccccccaaaaaa
 abcccaaaaaacccccccaaaaaaccccaaaaaaaacccccccaaaaaaaaaaaaaaaaccaaaaacccccccccccccccccccccccccaaaaaacccccccccccccccccccccccccccccaaaaaa
 abccccaaaaacaaaccaaaaaaaacccaaaaaaaaacccccccaaaaaaaaaaaaaaaacaaaaaacccccccccaaacccccccccccaaaaaaaaccccccccccaaccccccccccccccccaaaaaa
@@ -45,13 +45,12 @@ abcccccccccccccccaaaaaaaaccccccccccccaacccacccccccaaaaaaaaaaccccaacccccaaccccccc
 
     let height = letterMap.length;
     let width = letterMap[0].length;
-    let start: number[] = [], end: number[] = [];
+    let start: number[] = [];
     let directions = [[0, -1], [1, 0], [0, 1], [-1, 0]];
 
     for (let j = 0; j < height; j++) {
         for (let i = 0; i < width; i++) {
-            if (letterMap[j][i] == 'S') start = [i, j];
-            if (letterMap[j][i] == 'E') end = [i, j];
+            if (letterMap[j][i] == 'E') start = [i, j];
         }
     }
 
@@ -64,22 +63,22 @@ abcccccccccccccccaaaaaaaaccccccccccccaacccacccccccaaaaaaaaaaccccaacccccaaccccccc
 
     function h(point: string) {
         let [x, y] = point.split(',').map(Number);
-        let dist = Math.abs(x - end[0]) + Math.abs(y - end[1]);
-        let height = 25 - numberMap[y][x];
-        return Math.max(dist, height);
+        return numberMap[y][x];
     }
 
     async function countSteps(cameFrom: Map<string, string>, current: string) {
         let steps = 0;
-        canvas.colorEnd();
+        let end = current.split(',').map(Number);
+        canvas.colorEnd(end[0], end[1]);
         while (cameFrom.has(current)) {
             let [x, y] = current.split(',').map(Number);
             await canvas.colorPath(x, y);
             current = cameFrom.get(current)!;
             steps++;
-            canvas.colorEnd();
+            canvas.colorEnd(end[0], end[1]);
             canvas.answerCount(steps);
         }
+        canvas.colorStart();
         return steps;
     }
 
@@ -99,17 +98,16 @@ abcccccccccccccccaaaaaaaaccccccccccccaacccacccccccaaaaaaaaaaccccaacccccaaccccccc
                 }
             }
             this.colorStart();
-            this.colorEnd();
         }
 
         colorStart() {
-            this.ctx.fillStyle = `rgb(0,255,0)`;
+            this.ctx.fillStyle = `rgb(255,0,0)`;
             this.ctx.fillRect((start[0] * 10) + 20, (start[1] * 10) + 20, 9, 9);
         }
 
-        colorEnd() {
-            this.ctx.fillStyle = `rgb(255,0,0)`;
-            this.ctx.fillRect((end[0] * 10) + 20, (end[1] * 10) + 20, 9, 9);
+        colorEnd(x: number, y: number) {
+            this.ctx.fillStyle = `rgb(0,255,0)`;
+            this.ctx.fillRect((x * 10) + 20, (y * 10) + 20, 9, 9);
         }
 
         async colorPoint(x: number, y: number) {
@@ -136,7 +134,6 @@ abcccccccccccccccaaaaaaaaccccccccccccaacccacccccccaaaaaaaaaaccccaacccccaaccccccc
     async function aStar(): Promise<number> {
         await canvas.sleep(1000);
         let startKey = start.join(',');
-        let endKey = end.join(',');
         let openSet = new Set<string>([startKey]);
         let cameFrom = new Map<string, string>();
         let gScore = new Map<string, number>([[startKey, 0]]);
@@ -151,16 +148,15 @@ abcccccccccccccccaaaaaaaaccccccccccccaacccacccccccaaaaaaaaaaccccaacccccaaccccccc
                     currScore = newScore;
                 }
             }
-            if (current == endKey) return countSteps(cameFrom, current);
+            let currentArr = current.split(",").map(Number);
+            if (numberMap[currentArr[1]][currentArr[0]] == 0) return countSteps(cameFrom, current);
             openSet.delete(current);
 
             for (const dir of directions) {
-                let currentArr = current.split(",").map(Number);
                 let neighborArr = currentArr.map((a, i) => a + dir[i]);
                 if (neighborArr[0] < 0 || width <= neighborArr[0]) continue;
                 if (neighborArr[1] < 0 || height <= neighborArr[1]) continue;
-                if (numberMap[currentArr[1]][currentArr[0]] < numberMap[neighborArr[1]][neighborArr[0]] - 1) continue;
-
+                if (numberMap[currentArr[1]][currentArr[0]] > numberMap[neighborArr[1]][neighborArr[0]] + 1) continue;
                 let neighbor = neighborArr.join(',');
                 let tentative_gScore = (gScore.get(current) ?? Infinity) + 1;
                 if (tentative_gScore < (gScore.get(neighbor) ?? Infinity)) {
