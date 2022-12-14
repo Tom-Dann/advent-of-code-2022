@@ -224,6 +224,7 @@ class Canvas {
 let canvas = new Canvas();
 
 // Sand flow
+let count = 0;
 async function flow() {
     let checks = [[0, 1], [-1, 1], [1, 1]];
     let finished = false;
@@ -255,9 +256,8 @@ async function flow() {
         canvas.colourPath(path);
         canvas.colourSand([x, y]);
         map[x][y] = legend.sand;
-        let count = map.reduce((a, b) => a + b.reduce((prev, curr) => prev + +(curr == legend.sand), 0), 0);
-        canvas.answerCount(count);
-        if (!part1done || count % 20 == 0) await canvas.sleep(10);
+        if (!finished) canvas.answerCount(++count);
+        if (!part1done || count % 10 == 0) await canvas.sleep(10);
     }
 }
 flow();
