@@ -17,7 +17,7 @@ for (const val of vals) {
     let decimalValue = 0;
     for (const [i, str] of val.entries()) {
         let num = strMap.get(str);
-        if (num == null) throw new Error(`String value ${str} unkown`);
+        if (num == null) throw new Error(`String value ${str} unknown`);
         decimalValue += ((5 ** i) * num);
     }
     decimalSum += decimalValue;
@@ -37,12 +37,11 @@ let place = 0;
 let snafu = '';
 while (remainder) {
     const unit = 5 ** place
-    const mod = 5 ** (place + 1);
+    const mod = 5 ** ++place;
     const num = (((remainder + 2 * unit) % mod) / unit) - 2;
     const str = numMap.get(num);
-    if (str == null) throw new Error(`Number value ${num} unkown`);
+    if (str == null) throw new Error(`Number value ${num} unknown`);
     remainder -= num * unit;
     snafu = str + snafu;
-    place++;
 }
 console.log('Answer:', snafu);
